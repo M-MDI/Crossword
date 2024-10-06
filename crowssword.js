@@ -17,6 +17,7 @@ const crosswordSolver = (emptyPuzzle, words) => {
     return true;
   };
 
+
   // Helper function to place a word in the puzzle
   const placeWord = (puzzle, word, row, col, direction) => {
     const newPuzzle = puzzle.map((row) => [...row]);
@@ -33,6 +34,7 @@ const crosswordSolver = (emptyPuzzle, words) => {
   };
 
   // Helper function to solve the puzzle recursively
+  
   const solve = (puzzle, remainingWords) => {
     if (remainingWords.length === 0) return puzzle;
 
