@@ -102,10 +102,12 @@ const getPaths = (puzzle) => {
 }
 
 const goTroughPaths = (paths, puzzle, words) => {
+  
   // loop over the paths 
       // loop over the words and pick one
       // add it to the puzzle in the specific path
       // call goTroughPaths and send the paths without the chosen path and word and with new puzzle
+
   for (let i = 0; i < paths.length; i++) {
       for (let k = 0; k < words.length; k++) {
           const word = words[k]
