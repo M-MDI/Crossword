@@ -6,12 +6,16 @@ const crosswordSolver = (emptyPuzzle, words) => {
   // create a variable hold paths 
       // path definsion {path: [{x,y}]}
   const paths = getPaths(base)
+  
   const puzzle = base.map(e => e.map(e => ""))
+
   const res = goTroughPaths(paths, [...puzzle], words)
+  
   if (!res) {
       console.log("Error")
       return
   }
+  
   const formatedResult = res.map(row => {
       return row.map(item => {
           if (item === "") {
@@ -23,6 +27,7 @@ const crosswordSolver = (emptyPuzzle, words) => {
   }).join("\n")
   console.log(formatedResult)
 }
+
 const intialize = (emptyPuzzle) => {
   return emptyPuzzle.split("\n").map(item => item.split(""))
 }
@@ -69,6 +74,7 @@ const getPaths = (puzzle) => {
       // } else {
       //     path = []
       // }
+
       while (col < puzzle.length) {
           const item = puzzle[col][row]
           if (Number(item) > 0 && !start) {
@@ -87,12 +93,14 @@ const getPaths = (puzzle) => {
       }
       row++
   }
+
   if (path.length > 1) {
       paths.push({path:[...path]})
       path = []
   }
   return paths
 }
+
 const goTroughPaths = (paths, puzzle, words) => {
   // loop over the paths 
       // loop over the words and pick one
@@ -190,4 +198,5 @@ const words = [
 'seaside',
 'sandals',
 ]
+
 crosswordSolver(puzzle, words)
