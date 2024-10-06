@@ -27,7 +27,7 @@ const crosswordSolver = (emptyPuzzle, words) => {
   }).join("\n")
   console.log(formatedResult)
 }
-
+/* --- //**+**\\--- */ 
 const intialize = (emptyPuzzle) => {
   return emptyPuzzle.split("\n").map(item => item.split(""))
 }
@@ -102,7 +102,7 @@ const getPaths = (puzzle) => {
 }
 
 const goTroughPaths = (paths, puzzle, words) => {
-  
+
   // loop over the paths 
       // loop over the words and pick one
       // add it to the puzzle in the specific path
