@@ -1,104 +1,182 @@
 const crosswordSolver = (emptyPuzzle, words) => {
-  // Helper function to check if a word fits in a given position
-  const wordFits = (puzzle, word, row, col, direction) => {
-    if (direction === "across") {
-      if (col + word.length > puzzle[row].length) return false;
-      for (let i = 0; i < word.length; i++) {
-        if (puzzle[row][col + i] !== "." && puzzle[row][col + i] !== word[i])
-          return false;
-      }
-    } else {
-      if (row + word.length > puzzle.length) return false;
-      for (let i = 0; i < word.length; i++) {
-        if (puzzle[row + i][col] !== "." && puzzle[row + i][col] !== word[i])
-          return false;
-      }
-    }
-    return true;
-  };
-
-
-  // Helper function to place a word in the puzzle
-  const placeWord = (puzzle, word, row, col, direction) => {
-    const newPuzzle = puzzle.map((row) => [...row]);
-    if (direction === "across") {
-      for (let i = 0; i < word.length; i++) {
-        newPuzzle[row][col + i] = word[i];
-      }
-    } else {
-      for (let i = 0; i < word.length; i++) {
-        newPuzzle[row + i][col] = word[i];
-      }
-    }
-    return newPuzzle;
-  };
-
-  // Helper function to solve the puzzle recursively
-  
-  const solve = (puzzle, remainingWords) => {
-    if (remainingWords.length === 0) return puzzle;
-
-    for (let row = 0; row < puzzle.length; row++) {
-      for (let col = 0; col < puzzle[row].length; col++) {
-        if (!isNaN(puzzle[row][col])) {
-          const numWords = parseInt(puzzle[row][col]);
-          if (numWords > 0) {
-            for (let direction of ["across", "down"]) {
-              for (let i = 0; i < remainingWords.length; i++) {
-                const word = remainingWords[i];
-                if (wordFits(puzzle, word, row, col, direction)) {
-                  const newPuzzle = placeWord(
-                    puzzle,
-                    word,
-                    row,
-                    col,
-                    direction
-                  );
-                  const newRemainingWords = remainingWords.filter(
-                    (_, index) => index !== i
-                  );
-                  const result = solve(newPuzzle, newRemainingWords);
-                  if (result) return result;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return null;
-  };
-
-  try {
-    // Parse the empty puzzle
-    const puzzleRows = emptyPuzzle.split("\n");
-    const puzzle = puzzleRows.map((row) => row.split(""));
-
-    // Check for duplicate words
-    if (new Set(words).size !== words.length) {
-      throw new Error("Duplicate words are not allowed");
-    }
-
-    // Solve the puzzle
-    const solution = solve(puzzle, words);
-
-    if (solution) {
-      // Convert the solution back to a string
-      const solutionString = solution.map((row) => row.join("")).join("\n");
-      console.log(solutionString);
-    } else {
-      throw new Error("No unique solution found");
-    }
-  } catch (error) {
-    console.log("Error");
+  // check emptyPuzzle
+  // check words duplicates
+  // create base (convert emptyPuzzle to 2d array)
+  const base = intialize(emptyPuzzle)
+  // create a variable hold paths 
+      // path definsion {path: [{x,y}]}
+  const paths = getPaths(base)
+  const puzzle = base.map(e => e.map(e => ""))
+  const res = goTroughPaths(paths, [...puzzle], words)
+  if (!res) {
+      console.log("Error")
+      return
   }
-};
-
-// Example usage:
-const emptyPuzzle = `2001
-  0..0
-  1000
-  0..0`;
-const words = ["casa", "alan", "ciao", "anta"];
-
-crosswordSolver(emptyPuzzle, words);
+  const formatedResult = res.map(row => {
+      return row.map(item => {
+          if (item === "") {
+              return "."
+          } else {
+              return item
+          }
+      }).join("")
+  }).join("\n")
+  console.log(formatedResult)
+}
+const intialize = (emptyPuzzle) => {
+  return emptyPuzzle.split("\n").map(item => item.split(""))
+}
+const getPaths = (puzzle) => {
+  const paths = []
+  let path = []
+  for (let i = 0; i < puzzle.length; i++) {
+      const row = puzzle[i]
+      let start = false
+      if (path.length > 1) {
+          paths.push({path:[...path]})
+          path = []
+      } else {
+          path = []
+      }
+      for (let k = 0; k < row.length; k++) {
+          if (Number(row[k]) > 0 && !start) {
+              start = true
+              path.push({x: k, y: i})
+          } else if (row[k] !== "." && start) {
+              path.push({x: k, y: i})
+          } else {
+              start = false
+              if (path.length > 1) {
+                  paths.push({path:[...path]})
+              }
+              path = []
+          }
+      }
+  }
+  // if (path.length > 1) {
+  //     paths.push({path:[...path]})
+  //     path = []
+  // }
+  let row = 0
+  
+  while (row < puzzle[0].length) {
+      let col = 0
+      let start = false
+      // if (path.length > 1) {
+      //     paths.push({path:[...path]})
+      //     path = []
+      // } else {
+      //     path = []
+      // }
+      while (col < puzzle.length) {
+          const item = puzzle[col][row]
+          if (Number(item) > 0 && !start) {
+              start = true
+              path.push({x: row, y: col})
+          } else if (item !== "." && start) {
+              path.push({x: row, y: col})
+          } else {
+              start = false
+              if (path.length > 1) {
+                  paths.push({path:[...path]})
+              }
+              path = []
+          }
+          col++
+      }
+      row++
+  }
+  if (path.length > 1) {
+      paths.push({path:[...path]})
+      path = []
+  }
+  return paths
+}
+const goTroughPaths = (paths, puzzle, words) => {
+  // loop over the paths 
+      // loop over the words and pick one
+      // add it to the puzzle in the specific path
+      // call goTroughPaths and send the paths without the chosen path and word and with new puzzle
+  for (let i = 0; i < paths.length; i++) {
+      for (let k = 0; k < words.length; k++) {
+          const word = words[k]
+          const path = paths[i]
+          if (checker(path, word, puzzle)) {
+              const newPaths = removeItem(paths, i)
+              const newPuzzel = fillPath(paths[i], [...puzzle], words[k])
+              const newWords = removeItem(words, k)
+              const result = goTroughPaths(newPaths, newPuzzel, newWords)
+              if (result === null) {
+                  continue
+              } else {
+                  return result
+              }
+          }
+      }
+  }
+  // return null if the paths or the words not finish
+  // else return the puzzle
+  if (paths.length !== 0 || words.length !== 0) {
+      return null
+  }
+  return puzzle
+}
+// fill a path in the puzzle with a word
+const fillPath = (path, puzzle, word) => {
+  if (word.length != path.path.length) {
+      return null
+  }
+  puzzle = puzzle.map(e => e.map(e => e))
+  for (let i = 0; i < path.path.length; i++) {
+      const [x, y] = [path.path[i].x, path.path[i].y]
+      puzzle[y][x] = word[i]
+  }
+  return puzzle
+}
+// check if the word can be added to a specfic path in the puzzle
+  // check if the length is the same
+  // check if the fill cells in the path in the puzzle are the same in the word
+const checker = (path, word, puzzle) => {
+  if (path.path.length !== word.length) {
+      return false
+  }
+  for (let i = 0; i < path.path.length; i++) {
+      const [x, y] = [path.path[i].x, path.path[i].y]
+      const cell = puzzle[y][x]
+      if (cell !== "" && cell !== word[i]) {
+          return false
+      }
+  }
+  return true
+}
+const removeItem = (arr, i) => {
+  return arr.filter((v, index) => index != i)
+}
+const puzzle = `...1...........
+..1000001000...
+...0....0......
+.1......0...1..
+.0....100000000
+100000..0...0..
+.0.....1001000.
+.0.1....0.0....
+.10000000.0....
+.0.0......0....
+.0.0.....100...
+...0......0....
+..........0....`
+const words = [
+'sun',
+'sunglasses',
+'suncream',
+'swimming',
+'bikini',
+'beach',
+'icecream',
+'tan',
+'deckchair',
+'sand',
+'seaside',
+'sandals',
+]
+crosswordSolver(puzzle, words)
