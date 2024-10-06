@@ -26,6 +26,7 @@ const crosswordSolver = (emptyPuzzle, words) => {
 const intialize = (emptyPuzzle) => {
   return emptyPuzzle.split("\n").map(item => item.split(""))
 }
+
 const getPaths = (puzzle) => {
   const paths = []
   let path = []
@@ -114,14 +115,18 @@ const goTroughPaths = (paths, puzzle, words) => {
           }
       }
   }
+
   // return null if the paths or the words not finish
   // else return the puzzle
+
   if (paths.length !== 0 || words.length !== 0) {
       return null
   }
   return puzzle
 }
+
 // fill a path in the puzzle with a word
+
 const fillPath = (path, puzzle, word) => {
   if (word.length != path.path.length) {
       return null
@@ -133,13 +138,16 @@ const fillPath = (path, puzzle, word) => {
   }
   return puzzle
 }
-// check if the word can be added to a specfic path in the puzzle
+
+  // check if the word can be added to a specfic path in the puzzle
   // check if the length is the same
   // check if the fill cells in the path in the puzzle are the same in the word
-const checker = (path, word, puzzle) => {
+
+  const checker = (path, word, puzzle) => {
   if (path.path.length !== word.length) {
       return false
   }
+
   for (let i = 0; i < path.path.length; i++) {
       const [x, y] = [path.path[i].x, path.path[i].y]
       const cell = puzzle[y][x]
@@ -147,11 +155,14 @@ const checker = (path, word, puzzle) => {
           return false
       }
   }
+
   return true
 }
+
 const removeItem = (arr, i) => {
   return arr.filter((v, index) => index != i)
 }
+
 const puzzle = `...1...........
 ..1000001000...
 ...0....0......
